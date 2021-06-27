@@ -1,1 +1,1 @@
-# wordpress_autoposter
+# wordpress_poster
