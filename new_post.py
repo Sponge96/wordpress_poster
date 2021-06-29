@@ -1,54 +1,48 @@
+from requests_html import HTMLSession
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.methods.posts import NewPost
-from requests_html import HTMLSession
-from bs4 import BeautifulSoup
 
-session = HTMLSession()
+def check_new_vid():
+    session = HTMLSession()
+    response = session.get("")
+    response.html.render(sleep=1)
+
+    title = response.html.xpath('//*[@id="video-title"]', first=True).text
+    link = response.html.xpath('//*[@id="video-title"]/@href', first=True)
+    compare_file(title, link)
 
 
-def get_video_data():
-    url = input("Please Enter the Video URL: ")
+def compare_file(title, link):
+    with open("most_recent_vid", "r") as file:
+        if file.read() == title:
+            return
+        else:
+            get_vid_desc(title, link)
+
+
+def get_vid_desc(title, link):
+    url = "https://www.youtube.com" + link
+    session = HTMLSession()
     response = session.get(url)
     response.html.render(sleep=1)
 
-    soup = BeautifulSoup(response.html.html, "html.parser")
-
-    video_data = {}
-
-    # URL
-    video_data["url"] = url
-
-    # Title
-    video_data['title'] = soup.find("h1").text.strip()
-    if video_data['title']:
-        print(f"Title: {video_data['title']}")
-
-    # Description
-    video_data["description"] = soup.find("yt-formatted-string", {"class": "content"}).text
-    if video_data['description']:
-        print(f"Description: {video_data['description']}")
-
-    return video_data
+    desc = response.html.xpath('//*[@id="description"]/yt-formatted-string', first=True).text
+    upload_post(title, url, desc)
 
 
-wp = Client('http://WEBSITE.com/xmlrpc.php', 'username', 'password')
+def upload_post(title, url, desc):
+    wp = Client('http://www.website.com/xmlrpc.php', 'username', 'password')
+
+    post = WordPressPost()
+    post.title = title
+    post.content = url + f"<!-- wp:paragraph --><p>{desc}</p><!-- /wp:paragraph -->"
+    post.terms_names = {
+        'post_tag': [''],
+        'category': [''],
+        'series': ['']
+    }
+    post.post_status = 'publish'
+    wp.call(NewPost(post))
 
 
-def new_post(video_data):
-    answer = input("Do you wish to publish?: ")
-    if answer.lower() in ("y", "ci", "yes"):
-        post = WordPressPost()
-        post.title = video_data['title']
-        post.content = video_data['url'] + f"<!-- wp:paragraph --><p>{video_data['description']}</p><!-- /wp:paragraph -->"
-        post.terms_names = {
-            'post_tag': ['video'],
-            'category': ['Video Podcast'],
-            'series': ['Sector Gaming']
-        }
-        post.post_status = 'publish'
-        wp.call(NewPost(post))
-        print("Your new post has been published and is now live!")
-    else:
-        return
-
-new_post(get_video_data())
+check_new_vid()
