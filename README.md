@@ -1,2 +1,2 @@
-- Python, HTML, WordPress XML-RPC API, BeautifulSoup
-- A simple script to help a friend automatically fill and publish a WordPress post by making use of bs4 to get the YouTube video information (title, URL & description). This information is then used in tandem with the WordPress XML-RPC API to correctly tag, categorize and populate the post, before publishing.
+- Python, HTML, WordPress XML-RPC API, Requests_html
+- A simple script to help a friend automatically fill and publish a WordPress post by making use of requests to get the YouTube video information (title, URL & description). This information is then used in tandem with the WordPress XML-RPC API to correctly tag, categorize and populate the post, before publishing.
