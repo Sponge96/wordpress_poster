@@ -2,25 +2,26 @@ from requests_html import HTMLSession
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.methods.posts import NewPost
 
-def check_new_vid():
+
+def get_info():
     session = HTMLSession()
-    response = session.get("")
+    response = session.get("URL")
     response.html.render(sleep=1)
 
     title = response.html.xpath('//*[@id="video-title"]', first=True).text
     link = response.html.xpath('//*[@id="video-title"]/@href', first=True)
-    compare_file(title, link)
+    check_new_vid(title, link)
 
 
-def compare_file(title, link):
+def check_new_vid(title, link):
     with open("most_recent_vid", "r") as file:
         if file.read() == title:
             return
         else:
-            get_vid_desc(title, link)
+            get_desc(title, link)
 
 
-def get_vid_desc(title, link):
+def get_desc(title, link):
     url = "https://www.youtube.com" + link
     session = HTMLSession()
     response = session.get(url)
@@ -42,7 +43,15 @@ def upload_post(title, url, desc):
         'series': ['']
     }
     post.post_status = 'publish'
+    
     wp.call(NewPost(post))
+    
+    update_file(title)
 
 
-check_new_vid()
+def update_file(title):
+    with open("most_recent_vid", "w") as file:
+        file.write(title)
+
+
+get_info()
