@@ -1,2 +1,2 @@
 - Python, HTML, WordPress XML-RPC API, Requests_html
-- A simple script to help a friend automatically fill and publish a WordPress post by making use of requests to get the YouTube video information (title, URL & description). This information is then used in tandem with the WordPress XML-RPC API to correctly tag, categorize and populate the post, before publishing.
+- This Python script makes use of the Request-HTML library to gather metadata on a video. If the video title doesn't match the previously stored value it will get more data on the video (URL & description) and use this to populate (with the correct layout/tags) and publish a WordPress post with the help of the WordPress XML-RPC API.
